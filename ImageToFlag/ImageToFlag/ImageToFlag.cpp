@@ -27,30 +27,35 @@ int main(int argc, char** argv)
 		cout << "Could not open or find the image" << std::endl;
 		return -1;
 	}
+	
 
 	/// Set the dst image the same type and size as src
-	warp_dst = Mat::zeros(src.rows, src.cols, src.type());
+	Size size(src.cols, src.rows);
+	warp_dst = Mat::zeros(size, src.type());
 	warp_dst.setTo(Scalar(255, 255, 255));
 
 
 	//Distort done here
+
+	//Transformation Matrix
 	Mat t(2, 3, CV_64F, Scalar(0.0));
 
 	t.at<double>(0, 0) = 1;
 	t.at<double>(1, 1) = 1;
 	t.at<double>(0, 1) = -tan(0.17);
-	//    t.at<double>(2,2) = 1;
 
 
-	Mat dest;
-	Size size(src.cols, src.rows);
-	warpAffine(src, dest, t, size, INTER_LINEAR, BORDER_CONSTANT);
+	
+	//TODO Add Choose kind of interpolation
+	//warpAffine(src, warp_dst, t, size, INTER_NEAREST, BORDER_CONSTANT);
+	//warpAffine(src, warp_dst, t, size, INTER_LINEAR, BORDER_CONSTANT);
+	warpAffine(src, warp_dst, t, size, INTER_CUBIC, BORDER_CONSTANT);
 	//end distort here
 
 	namedWindow("Display window", WINDOW_AUTOSIZE);// Create a window for display.
 	namedWindow("Display window2", WINDOW_AUTOSIZE);// Create a window for display.
 	imshow("Display window", src);                   // Show our image inside it.
-	imshow("Display window2", dest);                   // Show our image inside it.
+	imshow("Display window2", warp_dst);                   // Show our image inside it.
 
 	waitKey(0);                                          // Wait for a keystroke in the window
 	return 0;
