@@ -16,38 +16,46 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-	if (argc != 2)
+	int wave_frequency = 3;//Default wave frequency
+	int amplitude = 20; //Default Height of sinus wave.
+	if (argc < 2)
 	{
 		cout << " Usage: ImageToFlag ImageToLoadAndDisplay" << endl;
 		return -1;
+	}
+	if (argc > 2){
+		wave_frequency = atoi(argv[2]);
 	}
 	
 	Mat src, warp_dst;
 	src = imread(argv[1], IMREAD_COLOR);   // Read the file
 
-	if (!src.data)                              // Check for invalid input
+
+	if ((!src.data)||src.empty())                              // Check for invalid input
 	{
 		cout << "Could not open or find the image" << std::endl;
 		return -2;
 	}
 	
 
-	/// Set the dst image the same type and size as src
-	Size size(src.cols, 3*src.rows);
+	/// Set the dst image the same type as src but in size + amplitude for height.
+	Size size(src.cols, src.rows + amplitude);
+	//Create destination Matrix
 	warp_dst = Mat::zeros(size, src.type());
+	//Set Background to white.
 	warp_dst.setTo(Scalar(255, 255, 255));
 	
 
 	//Distort done here
-	for (int y = 0; y < src.rows; y++){
-		for (int x = 0; x < src.cols; x++){
-			int new_y = y * (1 + sin(3 * MY_PI * x / src.cols)) / 2;
-			if ((new_y<warp_dst.rows) && (x<warp_dst.cols))
-				warp_dst.at<uchar>(new_y, x) = src.at<uchar>(y, x);
-		}
-	}
+	cout << "rows: " << src.rows << " cols: " << src.cols << "\n";
 	
 
+	for (int y = 0; y < src.rows; y++){
+		for (int x = 0; x < src.cols; x++){
+			int new_y = (warp_dst.rows + y + (int)(amplitude * sin(wave_frequency * MY_PI * x / src.cols))) % warp_dst.rows;
+			warp_dst.at<Vec3b>(new_y, x) = src.at<Vec3b>(y, x);
+		}
+	}
 	//Done distort here
 
 	namedWindow("Before", WINDOW_AUTOSIZE);  // Create a window for display.
