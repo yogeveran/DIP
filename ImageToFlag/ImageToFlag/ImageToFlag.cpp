@@ -1,12 +1,15 @@
 // ImageToFlag.cpp : Defines the entry point for the console application.
 //
 
+
 #include "stdafx.h"
 #include "core.hpp"
 #include "highgui.hpp"
 #include "imgproc.hpp"
 #include "opencv.hpp"
 #include <iostream>
+# define MY_PI           3.14159265358979323846
+
 using namespace cv;
 using namespace std;
 
@@ -15,7 +18,7 @@ int main(int argc, char** argv)
 {
 	if (argc != 2)
 	{
-		cout << " Usage: display_image ImageToLoadAndDisplay" << endl;
+		cout << " Usage: ImageToFlag ImageToLoadAndDisplay" << endl;
 		return -1;
 	}
 	
@@ -25,37 +28,32 @@ int main(int argc, char** argv)
 	if (!src.data)                              // Check for invalid input
 	{
 		cout << "Could not open or find the image" << std::endl;
-		return -1;
+		return -2;
 	}
 	
 
 	/// Set the dst image the same type and size as src
-	Size size(src.cols, src.rows);
+	Size size(src.cols, 3*src.rows);
 	warp_dst = Mat::zeros(size, src.type());
 	warp_dst.setTo(Scalar(255, 255, 255));
-
+	
 
 	//Distort done here
-
-	//Transformation Matrix
-	Mat t(2, 3, CV_64F, Scalar(0.0));
-
-	t.at<double>(0, 0) = 1;
-	t.at<double>(1, 1) = 1;
-	t.at<double>(0, 1) = -tan(0.17);
-
-
+	for (int y = 0; y < src.rows; y++){
+		for (int x = 0; x < src.cols; x++){
+			int new_y = y * (1 + sin(3 * MY_PI * x / src.cols)) / 2;
+			if ((new_y<warp_dst.rows) && (x<warp_dst.cols))
+				warp_dst.at<uchar>(new_y, x) = src.at<uchar>(y, x);
+		}
+	}
 	
-	//TODO Add Choose kind of interpolation
-	//warpAffine(src, warp_dst, t, size, INTER_NEAREST, BORDER_CONSTANT);
-	//warpAffine(src, warp_dst, t, size, INTER_LINEAR, BORDER_CONSTANT);
-	warpAffine(src, warp_dst, t, size, INTER_CUBIC, BORDER_CONSTANT);
-	//end distort here
 
-	namedWindow("Display window", WINDOW_AUTOSIZE);// Create a window for display.
-	namedWindow("Display window2", WINDOW_AUTOSIZE);// Create a window for display.
-	imshow("Display window", src);                   // Show our image inside it.
-	imshow("Display window2", warp_dst);                   // Show our image inside it.
+	//Done distort here
+
+	namedWindow("Before", WINDOW_AUTOSIZE);  // Create a window for display.
+	namedWindow("After", WINDOW_AUTOSIZE);   // Create a window for display.
+	imshow("Before", src);                   // Show Before Image
+	imshow("After", warp_dst);               // Show After  Image
 
 	waitKey(0);                                          // Wait for a keystroke in the window
 	return 0;
