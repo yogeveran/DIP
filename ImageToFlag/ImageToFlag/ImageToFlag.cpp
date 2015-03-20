@@ -39,7 +39,7 @@ int main(int argc, char** argv)
 	
 
 	/// Set the dst image the same type as src but in size + amplitude for height.
-	Size size(src.cols, src.rows + amplitude);
+	Size size(src.cols, src.rows + 2*amplitude);
 	//Create destination Matrix
 	warp_dst = Mat::zeros(size, src.type());
 	//Set Background to white.
@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 
 	for (int y = 0; y < src.rows; y++){
 		for (int x = 0; x < src.cols; x++){
-			int new_y = (warp_dst.rows + y + (int)(amplitude * sin(wave_frequency * MY_PI * x / src.cols))) % warp_dst.rows;
+			int new_y = (warp_dst.rows + y + amplitude + (int)(amplitude * sin(wave_frequency * MY_PI * x / src.cols))) % warp_dst.rows;
 			warp_dst.at<Vec3b>(new_y, x) = src.at<Vec3b>(y, x);
 		}
 	}
