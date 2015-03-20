@@ -17,10 +17,11 @@ using namespace std;
 int main(int argc, char** argv)
 {
 	int wave_frequency = 3;//Default wave frequency
-	int amplitude = 20; //Default Height of sinus wave.
+	double amplitude = 0.03;//Defined after load of picture to be 3%
 	if (argc < 2)
 	{
 		cout << " Usage: ImageToFlag ImageToLoadAndDisplay" << endl;
+		waitKey(0);                              // Wait for a keystroke in the window
 		return -1;
 	}
 	if (argc > 2){
@@ -29,11 +30,12 @@ int main(int argc, char** argv)
 	
 	Mat src, warp_dst;
 	src = imread(argv[1], IMREAD_COLOR);   // Read the file
-
+	amplitude = amplitude * src.rows;//% of picture height.
 
 	if ((!src.data)||src.empty())                              // Check for invalid input
 	{
 		cout << "Could not open or find the image" << std::endl;
+		waitKey(0);                              // Wait for a keystroke in the window
 		return -2;
 	}
 	
@@ -47,12 +49,9 @@ int main(int argc, char** argv)
 	
 
 	//Distort done here
-	cout << "rows: " << src.rows << " cols: " << src.cols << "\n";
-	
-
 	for (int y = 0; y < src.rows; y++){
 		for (int x = 0; x < src.cols; x++){
-			int new_y = (warp_dst.rows + y + amplitude + (int)(amplitude * sin(wave_frequency * MY_PI * x / src.cols))) % warp_dst.rows;
+			int new_y = (int)(warp_dst.rows + y + amplitude + (int)(amplitude * sin(wave_frequency * MY_PI * x / src.cols))) % warp_dst.rows;
 			warp_dst.at<Vec3b>(new_y, x) = src.at<Vec3b>(y, x);
 		}
 	}
@@ -63,7 +62,7 @@ int main(int argc, char** argv)
 	imshow("Before", src);                   // Show Before Image
 	imshow("After", warp_dst);               // Show After  Image
 
-	waitKey(0);                                          // Wait for a keystroke in the window
+	waitKey(0);                              // Wait for a keystroke in the window
 	return 0;
 }
 

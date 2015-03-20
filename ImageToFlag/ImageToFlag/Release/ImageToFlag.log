@@ -1,4 +1,4 @@
-﻿Build started 20/03/2015 17:18:11.
+﻿Build started 20/03/2015 17:24:48.
      1>Project "C:\Users\eranyogev\Documents\לימודים\סמסר ח\Digital Image Processing\ImageToFlag\ImageToFlag\ImageToFlag.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\opencv\build\Include /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Release\ImageToFlag.pch" /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt ImageToFlag.cpp
@@ -13,4 +13,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:02.04
+Time Elapsed 00:00:02.03
