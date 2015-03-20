@@ -13,7 +13,9 @@
 
 using namespace cv;
 using namespace std;
-
+bool in_Range(double value, int from, int to){
+	return (from <= floor(value)) && (ceil(value) < to);
+}
 
 int main(int argc, char** argv)
 {
@@ -41,7 +43,7 @@ int main(int argc, char** argv)
 	
 
 	/// Set the dst image the same type as src but in size + amplitude for height.
-	Size size(src.cols, src.rows + 2*amplitude);
+	Size size(src.cols, (int)ceil(src.rows + 2*amplitude));
 	//Create destination Matrix
 	warp_dst = Mat::zeros(size, src.type());
 	warp_dst_inter = Mat::zeros(size, src.type());
@@ -64,20 +66,40 @@ int main(int argc, char** argv)
 		for (int x = 0; x < warp_dst_inter.cols; x++){
 			double y = new_y - amplitude * ( 1 + sin(wave_frequency * MY_PI * x / src.cols));
 			int src_y;
+			double src_y1, src_y2;
 			switch (interpolation[0]){
 			case 'n':
 				src_y = ((int)round(y));
+				if ((src_y >= 0) && (src_y<src.rows))
+					warp_dst_inter.at<Vec3b>(new_y, x) = src.at<Vec3b>(src_y, x);
 				break;
 			case 'b'://Bi-Linear ------ Need To Do
+				src_y1 = floor(y);
+				src_y2 = ceil(y);
+				if (in_Range(src_y1, 0, src.rows)){
+					if (in_Range(src_y2, 0, src.rows)){//Both in range
+						warp_dst_inter.at<Vec3b>(new_y, x) = src.at<Vec3b>((int)src_y1, x)*(src_y2 - y) + src.at<Vec3b>((int)src_y2, x)*(y - src_y1);
+					}
+					else{
+						// 1 in range
+						warp_dst_inter.at<Vec3b>(new_y, x) = src.at<Vec3b>((int)src_y1, x);
+					}
+				}
+				else if (in_Range(src_y2, 0, src.rows)){
+					// 2 in range
+					warp_dst_inter.at<Vec3b>(new_y, x) = src.at<Vec3b>((int)src_y2, x);
+				}//else None in range
+				break;
 			case 'c'://Cubic	 ------ Need To Do
 			default:
 				src_y = ((int)round(y));
+				if (in_Range(src_y, 0, src.rows))
+					warp_dst_inter.at<Vec3b>(new_y, x) = src.at<Vec3b>(src_y, x);
 				break;
 				
 			}
 			
-			if ((src_y >= 0) && (src_y<src.rows))
-				warp_dst_inter.at<Vec3b>(new_y, x) = src.at<Vec3b>(src_y, x);
+			
 		}
 	}
 	cout << "\ndone backward \n";
