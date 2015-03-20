@@ -51,7 +51,7 @@ int main(int argc, char** argv)
 	//Distort done here
 	for (int y = 0; y < src.rows; y++){
 		for (int x = 0; x < src.cols; x++){
-			int new_y = (int)(warp_dst.rows + y + amplitude + (int)(amplitude * sin(wave_frequency * MY_PI * x / src.cols))) % warp_dst.rows;
+			int new_y = (int)( y + amplitude + (int)(amplitude * sin(wave_frequency * MY_PI * x / src.cols)));
 			warp_dst.at<Vec3b>(new_y, x) = src.at<Vec3b>(y, x);
 		}
 	}
