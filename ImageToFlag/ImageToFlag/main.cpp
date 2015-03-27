@@ -19,14 +19,14 @@ bool in_Range(double value, int from, int to) {
 }
 long uFunc(long d) {
 	if (d < 1 && d >= 0) {
-		return ((3 / 2) * pow(d, 3) - (5 / 2) * pow(d, 2) + 1);
+		return (1.5 * pow(d, 3) - 2.5 * pow(d, 2) + 1);
 	} else if (d < 2 && d >= 1) {
-		return ((-3 / 2) * pow(d, 3) + (5 / 2) * pow(d, 2) - 4 * d + 2);
+		return (-1.5 * pow(d, 3) + 2.5 * pow(d, 2) - 4 * d + 2);
 	} else
 		return 0;
 }
-Vec3b uFunc(Vec3b d) {
-	Vec3b ans = Vec3b(uFunc(d(0)),uFunc(d(1)),uFunc(d(2)));
+Vec3f uFunc(Vec3f d) {
+	Vec3f ans = Vec3f(uFunc(d(0)),uFunc(d(1)),uFunc(d(2)));
 	return ans;
 }
 /*
@@ -137,6 +137,7 @@ void calcLeftDown() {
 	}
 }
 */
+
 void calcRightUp() {
 	Mat rightUpX = Mat::zeros(MAT_SIZE, MAT_SIZE, src.type());
 	Mat rightUpY = Mat::zeros(MAT_SIZE, MAT_SIZE, src.type());
@@ -286,7 +287,7 @@ int main(int argc, char** argv) {
 	//Set Background to white.
 	dst.setTo(Scalar(255, 255, 255));
 	dst_inter.setTo(Scalar(255, 255, 255));
-	cv::copyMakeBorder(src, srcWithMirror, 2, 2, 2, 2, cv::BORDER_REFLECT, 0);
+	cv::copyMakeBorder(src, srcWithMirror, 10, 10, 10, 10, cv::BORDER_REFLECT, 0);
 	calcMatrices();
 	//Distort done here using forward scanning with no interpolation.
 	for (int y = 0; y < src.rows; y++) {
@@ -341,10 +342,10 @@ int main(int argc, char** argv) {
 				Point p1;
 				if (in_Range(y, 0, src.rows)) {
 					if (distFromSrcY > 0.5) { //Use topRight
-						toUse = rightUp;
+						toUse = rightDown;
 						p1 = Point(mirrX - 2, mirrY - 2);
 					} else {  //user bottomRight
-						toUse = rightDown;
+						toUse = rightUp;
 						p1 = Point(mirrX - 1, mirrY - 1);
 					}
 					Rect rect(p1, Size(4, 4));
