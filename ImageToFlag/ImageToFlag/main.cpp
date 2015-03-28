@@ -73,23 +73,13 @@ void calcRightUp(Mat src) {
 	rightUpYdouble[3][2] = 5 / 4;
 	rightUpYdouble[3][3] = 5 / 4;
 
-	double sumForNormal = 0;
 	for (int i = 0; i < MAT_SIZE; i++) {
 		for (int j = 0; j < MAT_SIZE; j++) {
 			//double uFuncAns = uFunc(rightUpXdouble[i][j]) * uFunc(rightUpYdouble[i][j]);
 			double uFuncAns = sqrt(pow(rightUpXdouble[i][j],2) + pow(rightUpYdouble[i][j],2));
-			sumForNormal += uFuncAns;
 			rightUp.at<Vec3b>(i, j) = Vec3b(uFuncAns,uFuncAns,uFuncAns);
 		}
 	}
-	/*
-	for (int i = 0; i < MAT_SIZE; i++) {
-			for (int j = 0; j < MAT_SIZE; j++) {
-				for (int k = 0; k < 3; k++)
-					rightUp.at<Vec3b>(i, j)(k) = rightUp.at<Vec3b>(i, j)(k)
-							/ sumForNormal;
-			}
-		}*/
 }
 void calcRightDown(Mat src) {
 	double** rightDownXdouble = new double*[MAT_SIZE];
@@ -132,22 +122,13 @@ void calcRightDown(Mat src) {
 	rightDownYdouble[3][2] = 7 / 4;
 	rightDownYdouble[3][3] = 7 / 4;
 
-	double sumForNormal = 0;
 	for (int i = 0; i < MAT_SIZE; i++) {
 		for (int j = 0; j < MAT_SIZE; j++) {
 			//double uFuncAns = uFunc(rightDownXdouble[i][j]) * uFunc(rightDownYdouble[i][j]);
 			double uFuncAns = sqrt(pow(rightDownXdouble[i][j],2) + pow(rightDownYdouble[i][j],2));
-			sumForNormal += uFuncAns;
 			rightDown.at<Vec3b>(i, j) = Vec3b(uFuncAns,uFuncAns,uFuncAns);
 		}
-	}/*
-	for (int i = 0; i < MAT_SIZE; i++) {
-		for (int j = 0; j < MAT_SIZE; j++) {
-			for (int k = 0; k < 3; k++)
-				rightDown.at<Vec3b>(i, j)(k) = rightDown.at<Vec3b>(i, j)(k)
-						/ sumForNormal;
-		}
-	}*/
+	}
 }
 void calcMatrices(Mat src) {
 	rightUp = Mat::zeros(MAT_SIZE, MAT_SIZE, src.type());
@@ -255,10 +236,7 @@ int main(int argc, char** argv) {
 					Vec3b newVec = Vec3b(0,0,0);
 					for (int cubic_i = 0; cubic_i < MAT_SIZE; cubic_i++) {
 						for (int cubic_j = 0; cubic_j < MAT_SIZE; cubic_j++) {
-							for (int cubic_k = 0; cubic_k < 3; cubic_k++) {
-								newVec(cubic_k) += cropped.at<Vec3b>(cubic_i,cubic_j)(cubic_k)
-										* toUse.at<Vec3b>(cubic_i, cubic_j)(cubic_k);
-							}
+							newVec += cropped.at<Vec3b>(cubic_i,cubic_j).mul(toUse.at<Vec3b>(cubic_i, cubic_j));
 						}
 					}
 					dst_inter.at<Vec3b>(dst_y, x) = newVec;
