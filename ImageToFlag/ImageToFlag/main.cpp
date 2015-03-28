@@ -25,9 +25,9 @@ int newRound(double num) {
 }
 double uFunc(double d) {
 	if (0 <= d && d < 1)
-		return (3 / 2) * (pow(d, 3)) - (5 / 2) * (pow(d, 2)) + 1;
+		return abs((3 / 2) * (pow(d, 3)) - (5 / 2) * (pow(d, 2)) + 1);
 	if (1 <= d && d < 2)
-		return -(3 / 2) * (pow(d, 3)) + (5 / 2) * (pow(d, 2)) - 4 * d + 2;
+		return abs(-(3 / 2) * (pow(d, 3)) + (5 / 2) * (pow(d, 2)) - 4 * d + 2);
 	return 0;
 }
 
@@ -72,14 +72,18 @@ void calcRightUp(Mat src) {
 	rightUpYdouble[3][1] = 5 / 4;
 	rightUpYdouble[3][2] = 5 / 4;
 	rightUpYdouble[3][3] = 5 / 4;
-
+	double sumForNormal = 0;
 	for (int i = 0; i < MAT_SIZE; i++) {
 		for (int j = 0; j < MAT_SIZE; j++) {
 			//double uFuncAns = uFunc(rightUpXdouble[i][j]) * uFunc(rightUpYdouble[i][j]);
 			double uFuncAns = sqrt(pow(rightUpXdouble[i][j],2) + pow(rightUpYdouble[i][j],2));
 			rightUp.at<Vec3b>(i, j) = Vec3b(uFuncAns,uFuncAns,uFuncAns);
+			sumForNormal += uFuncAns;
+			cout << uFuncAns << endl;
 		}
 	}
+	cout << sumForNormal << endl;
+	//rightUp = rightUp / sumForNormal;
 }
 void calcRightDown(Mat src) {
 	double** rightDownXdouble = new double*[MAT_SIZE];
@@ -121,14 +125,17 @@ void calcRightDown(Mat src) {
 	rightDownYdouble[3][1] = 7 / 4;
 	rightDownYdouble[3][2] = 7 / 4;
 	rightDownYdouble[3][3] = 7 / 4;
+	double sumForNormal = 0;
 
 	for (int i = 0; i < MAT_SIZE; i++) {
 		for (int j = 0; j < MAT_SIZE; j++) {
-			//double uFuncAns = uFunc(rightDownXdouble[i][j]) * uFunc(rightDownYdouble[i][j]);
-			double uFuncAns = sqrt(pow(rightDownXdouble[i][j],2) + pow(rightDownYdouble[i][j],2));
+			double uFuncAns = uFunc(rightDownXdouble[i][j]) * uFunc(rightDownYdouble[i][j]);
+			//double uFuncAns = sqrt(pow(rightDownXdouble[i][j],2) + pow(rightDownYdouble[i][j],2));
 			rightDown.at<Vec3b>(i, j) = Vec3b(uFuncAns,uFuncAns,uFuncAns);
+			sumForNormal += uFuncAns;
 		}
 	}
+	//rightDown = rightDown / sumForNormal;
 }
 void calcMatrices(Mat src) {
 	rightUp = Mat::zeros(MAT_SIZE, MAT_SIZE, src.type());
