@@ -14,7 +14,6 @@
 using namespace cv;
 using namespace std;
 Mat_<Vec3b> dst, dst_inter, srcWithMirror;
-double leftUp[MAT_SIZE][MAT_SIZE], leftDown[MAT_SIZE][MAT_SIZE], rightUp[MAT_SIZE][MAT_SIZE], rightDown[MAT_SIZE][MAT_SIZE];
 
 double cubicInterpolate(double p[4], double x) {
 	return p[1] + 0.5 * x*(p[2] - p[0] + x*(2.0*p[0] - 5.0*p[1] + 4.0*p[2] - p[3] + x*(3.0*(p[1] - p[2]) + p[3] - p[0])));
@@ -27,122 +26,6 @@ double bicubicInterpolate(double p[4][4], double x, double y) {
 	arr[2] = cubicInterpolate(p[2], y);
 	arr[3] = cubicInterpolate(p[3], y);
 	return cubicInterpolate(arr, x);
-}
-void calcRightUp(Mat src) {
-	double** rightUpXdouble = new double*[MAT_SIZE];
-	for (int i = 0; i < MAT_SIZE; ++i)
-		rightUpXdouble[i] = new double[MAT_SIZE];
-	double** rightUpYdouble = new double*[MAT_SIZE];
-	for (int i = 0; i < MAT_SIZE; ++i)
-		rightUpYdouble[i] = new double[MAT_SIZE];
-
-	rightUpXdouble[0][0] = 5 / 4;
-	rightUpXdouble[0][1] = 1 / 4;
-	rightUpXdouble[0][2] = 3 / 4;
-	rightUpXdouble[0][3] = 7 / 4;
-	rightUpXdouble[1][0] = 5 / 4;
-	rightUpXdouble[1][1] = 1 / 4;
-	rightUpXdouble[1][2] = 3 / 4;
-	rightUpXdouble[1][3] = 7 / 4;
-	rightUpXdouble[2][0] = 5 / 4;
-	rightUpXdouble[2][1] = 1 / 4;
-	rightUpXdouble[2][2] = 3 / 4;
-	rightUpXdouble[2][3] = 7 / 4;
-	rightUpXdouble[3][0] = 5 / 4;
-	rightUpXdouble[3][1] = 1 / 4;
-	rightUpXdouble[3][2] = 3 / 4;
-	rightUpXdouble[3][3] = 7 / 4;
-
-	rightUpYdouble[0][0] = 7 / 4;
-	rightUpYdouble[0][1] = 7 / 4;
-	rightUpYdouble[0][2] = 7 / 4;
-	rightUpYdouble[0][3] = 7 / 4;
-	rightUpYdouble[1][0] = 3 / 4;
-	rightUpYdouble[1][1] = 3 / 4;
-	rightUpYdouble[1][2] = 3 / 4;
-	rightUpYdouble[1][3] = 3 / 4;
-	rightUpYdouble[2][0] = 1 / 4;
-	rightUpYdouble[2][1] = 1 / 4;
-	rightUpYdouble[2][2] = 1 / 4;
-	rightUpYdouble[2][3] = 1 / 4;
-	rightUpYdouble[3][0] = 5 / 4;
-	rightUpYdouble[3][1] = 5 / 4;
-	rightUpYdouble[3][2] = 5 / 4;
-	rightUpYdouble[3][3] = 5 / 4;
-
-	double sum = 0;
-	for (int i = 0; i < MAT_SIZE; i++) {
-		for (int j = 0; j < MAT_SIZE; j++) {
-			//double uFuncAns = uFunc(rightUpXdouble[i][j]) * uFunc(rightUpYdouble[i][j]);
-			double uFuncAns = sqrt(pow(rightUpXdouble[i][j], 2) + pow(rightUpYdouble[i][j], 2));
-			rightUp[i][j] = uFuncAns;
-			sum += uFuncAns;
-		}
-	}
-	if (sum != 0)
-		for (int i = 0; i < MAT_SIZE; i++)
-			for (int j = 0; j < MAT_SIZE; j++)
-				rightUp[i][j] /= sum;
-}
-void calcRightDown(Mat src) {
-	double** rightDownXdouble = new double*[MAT_SIZE];
-	for (int i = 0; i < MAT_SIZE; ++i)
-		rightDownXdouble[i] = new double[MAT_SIZE];
-	double** rightDownYdouble = new double*[MAT_SIZE];
-	for (int i = 0; i < MAT_SIZE; ++i)
-		rightDownYdouble[i] = new double[MAT_SIZE];
-	rightDownXdouble[0][0] = 5 / 4;
-	rightDownXdouble[0][1] = 1 / 4;
-	rightDownXdouble[0][2] = 3 / 4;
-	rightDownXdouble[0][3] = 7 / 4;
-	rightDownXdouble[1][0] = 5 / 4;
-	rightDownXdouble[1][1] = 1 / 4;
-	rightDownXdouble[1][2] = 3 / 4;
-	rightDownXdouble[1][3] = 7 / 4;
-	rightDownXdouble[2][0] = 5 / 4;
-	rightDownXdouble[2][1] = 1 / 4;
-	rightDownXdouble[2][2] = 3 / 4;
-	rightDownXdouble[2][3] = 7 / 4;
-	rightDownXdouble[3][0] = 5 / 4;
-	rightDownXdouble[3][1] = 1 / 4;
-	rightDownXdouble[3][2] = 3 / 4;
-	rightDownXdouble[3][3] = 7 / 4;
-
-	rightDownYdouble[0][0] = 5 / 4;
-	rightDownYdouble[0][1] = 5 / 4;
-	rightDownYdouble[0][2] = 5 / 4;
-	rightDownYdouble[0][3] = 5 / 4;
-	rightDownYdouble[1][0] = 1 / 4;
-	rightDownYdouble[1][1] = 1 / 4;
-	rightDownYdouble[1][2] = 1 / 4;
-	rightDownYdouble[1][3] = 1 / 4;
-	rightDownYdouble[2][0] = 3 / 4;
-	rightDownYdouble[2][1] = 3 / 4;
-	rightDownYdouble[2][2] = 3 / 4;
-	rightDownYdouble[2][3] = 3 / 4;
-	rightDownYdouble[3][0] = 7 / 4;
-	rightDownYdouble[3][1] = 7 / 4;
-	rightDownYdouble[3][2] = 7 / 4;
-	rightDownYdouble[3][3] = 7 / 4;
-
-	double sum = 0;
-	for (int i = 0; i < MAT_SIZE; i++) {
-		for (int j = 0; j < MAT_SIZE; j++) {
-			//double uFuncAns = uFunc(rightDownXdouble[i][j]) * uFunc(rightDownYdouble[i][j]);
-			double uFuncAns = sqrt(pow(rightDownXdouble[i][j], 2) + pow(rightDownYdouble[i][j], 2));
-			rightDown[i][j] = uFuncAns;
-			sum += uFuncAns;
-		}
-	}
-	if (sum != 0)
-		for (int i = 0; i < MAT_SIZE; i++)
-			for (int j = 0; j < MAT_SIZE; j++)
-				rightUp[i][j] /= sum;
-}
-void calcMatrices(Mat src) {
-
-	calcRightUp(src);
-	calcRightDown(src);
 }
 
 bool in_Range(double value, int from, int to) {
@@ -200,7 +83,7 @@ int main(int argc, char** argv) {
 	dst.setTo(Scalar(255, 255, 255));
 	dst_inter.setTo(Scalar(255, 255, 255));
 	cv::copyMakeBorder(src, srcWithMirror, padding, padding, padding, padding, BORDER_REPLICATE, 0);
-	calcMatrices(src);
+
 	//Distort done here using forward scanning with no interpolation.
 	for (int x = 0; x < src.cols; x++) {
 		for (int y = 0; y < src.rows; y++) {
@@ -234,10 +117,10 @@ int main(int argc, char** argv) {
 				if (in_Range(src_y1, 0, src.rows)) {
 					if (in_Range(src_y2, 0, src.rows)) {         //Both in range
 						for (int i = 0; i < 3; i++) {
-							dst_inter.at<Vec3b>(dst_y, x)(i) = src.at<Vec3b>(
+							dst_inter.at<Vec3b>(dst_y, x)(i) = (uchar)(src.at<Vec3b>(
 								(int)src_y1, x)(i)* (src_y2 - y)
 								+ src.at<Vec3b>((int)src_y2, x)(i)
-								* (y - src_y1);
+								* (y - src_y1));
 						}
 					}
 					else {
@@ -253,42 +136,46 @@ int main(int argc, char** argv) {
 				break;
 			case 'c': {
 				if (in_Range(y, 0, src.rows)) {
-					double distFromSrcY = abs(y - (int)y);
+					double distFromSrcY = abs(y - round(y));
 					int mirrX = x + 2;
 					int mirrY = ((int)newRound(y)) + 2;
 					Point p1;
-					if (distFromSrcY > 0.5) { //Use bottomRight
-						p1 = Point(mirrX - 2, mirrY - 2);
+					if (y < round(y)) { //Use bottomRight
+						p1 = Point(mirrX - 2 + padding, mirrY - 2 + padding);
 
 						Rect rect(p1, Size(4, 4));
 						Mat cropped = srcWithMirror(rect);
 
-						Rect roi(mirrX - 2, mirrY - 2, 4, 4);
+						Rect roi(mirrX - 2 + padding, mirrY - 2 + padding, 4, 4);
 						cv::Mat croppedRef(srcWithMirror, roi);
 						croppedRef.copyTo(cropped);
-
+						
 						for (int i = 0; i < 3; i++) {
-							dst_inter.at<Vec3b>(dst_y, x)(i) = cropped.at<Vec3b>(0, 0)(i)*rightDown[0][0] + cropped.at<Vec3b>(0, 1)(i)*rightDown[0][1] + cropped.at<Vec3b>(0, 2)(i)*rightDown[0][2] + cropped.at<Vec3b>(0, 3)(i)*rightDown[0][3]
-								+ cropped.at<Vec3b>(1, 0)(i)*rightDown[1][0] + cropped.at<Vec3b>(1, 1)(i)*rightDown[1][1] + cropped.at<Vec3b>(1, 2)(i)*rightDown[1][2] + cropped.at<Vec3b>(1, 3)(i)*rightDown[1][3]
-								+ cropped.at<Vec3b>(2, 0)(i)*rightDown[2][0] + cropped.at<Vec3b>(2, 1)(i)*rightDown[2][1] + cropped.at<Vec3b>(2, 2)(i)*rightDown[2][2] + cropped.at<Vec3b>(2, 3)(i)*rightDown[2][3]
-								+ cropped.at<Vec3b>(3, 0)(i)*rightDown[3][0] + cropped.at<Vec3b>(3, 1)(i)*rightDown[3][1] + cropped.at<Vec3b>(3, 2)(i)*rightDown[3][2] + cropped.at<Vec3b>(3, 3)(i)*rightDown[3][3];
+							double croppedDouble[MAT_SIZE][MAT_SIZE];
+							for (int row = 0; row < MAT_SIZE; row++)
+								for (int col = 0; col < MAT_SIZE; col++)
+									croppedDouble[row][col] = cropped.at<Vec3b>(row, col)(i);
+
+							dst_inter.at<Vec3b>(dst_y, x)(i) = (uchar)round(bicubicInterpolate(croppedDouble, 0, 1.0 - distFromSrcY));
 						}
 					}
 					else {  //Use topRight
-						p1 = Point(mirrX - 1, mirrY - 1);
+						p1 = Point(mirrX - 1 + padding, mirrY - 1 + padding);
 
 						Rect rect(p1, Size(4, 4));
 						Mat cropped = srcWithMirror(rect);
 
-						Rect roi(mirrX - 1, mirrY - 1, 4, 4);
+						Rect roi(mirrX - 1 + padding, mirrY - 1 + padding, 4, 4);
 						cv::Mat croppedRef(srcWithMirror, roi);
 						croppedRef.copyTo(cropped);
 
 						for (int i = 0; i < 3; i++) {
-							dst_inter.at<Vec3b>(dst_y, x)(i) = cropped.at<Vec3b>(0, 0)(i)*rightUp[0][0] + cropped.at<Vec3b>(0, 1)(i)*rightUp[0][1] + cropped.at<Vec3b>(0, 2)(i)*rightUp[0][2] + cropped.at<Vec3b>(0, 3)(i)*rightUp[0][3]
-								+ cropped.at<Vec3b>(1, 0)(i)*rightUp[1][0] + cropped.at<Vec3b>(1, 1)(i)*rightUp[1][1] + cropped.at<Vec3b>(1, 2)(i)*rightUp[1][2] + cropped.at<Vec3b>(1, 3)(i)*rightUp[1][3]
-								+ cropped.at<Vec3b>(2, 0)(i)*rightUp[2][0] + cropped.at<Vec3b>(2, 1)(i)*rightUp[2][1] + cropped.at<Vec3b>(2, 2)(i)*rightUp[2][2] + cropped.at<Vec3b>(2, 3)(i)*rightUp[2][3]
-								+ cropped.at<Vec3b>(3, 0)(i)*rightUp[3][0] + cropped.at<Vec3b>(3, 1)(i)*rightUp[3][1] + cropped.at<Vec3b>(3, 2)(i)*rightUp[3][2] + cropped.at<Vec3b>(3, 3)(i)*rightUp[3][3];
+							double croppedDouble[MAT_SIZE][MAT_SIZE];
+							for (int row = 0; row < MAT_SIZE; row++)
+								for (int col = 0; col < MAT_SIZE; col++)
+									croppedDouble[row][col] = cropped.at<Vec3b>(row, col)(i);
+							double tmp = bicubicInterpolate(croppedDouble, 0, distFromSrcY);
+							dst_inter.at<Vec3b>(dst_y, x)(i) = (uchar)round(tmp);
 						}
 					}
 
