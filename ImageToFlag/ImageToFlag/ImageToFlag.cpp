@@ -13,7 +13,8 @@
 #define padding 20
 using namespace cv;
 using namespace std;
-Mat_<Vec3b> dst, dst_inter, srcWithMirror;
+Mat_<Vec3b> dst, srcWithMirror;
+Mat_<Vec3f> dst_inter;
 
 double cubicInterpolate(double p[4], double x) {
 	return p[1] + 0.5 * x*(p[2] - p[0] + x*(2.0*p[0] - 5.0*p[1] + 4.0*p[2] - p[3] + x*(3.0*(p[1] - p[2]) + p[3] - p[0])));
@@ -78,7 +79,7 @@ int main(int argc, char** argv) {
 	Size sizeMirror(src.cols + 2, src.rows + 2);
 	srcWithMirror = Mat::zeros(sizeMirror, src.type());
 	dst = Mat::zeros(size, src.type());
- 	dst_inter = Mat::zeros(size, src.type());
+ 	dst_inter = Mat::zeros(size, CV_32F);
 	//Set Background to white.
 	dst.setTo(Scalar(255, 255, 255));
 	dst_inter.setTo(Scalar(255, 255, 255));
@@ -108,8 +109,11 @@ int main(int argc, char** argv) {
 			switch (interpolation[0]) {
 			case 'n':
 				src_y = (int)round(y);
-				if (in_Range(src_y, 0, src.rows))
-					dst_inter.at<Vec3b>(dst_y, x) = src.at<Vec3b>(src_y, x);
+				if (in_Range(src_y, 0, src.rows)){
+					dst_inter.at<Vec3f>(dst_y, x)(0) = src.at<Vec3b>(src_y, x)(0) / 255.0f;
+					dst_inter.at<Vec3f>(dst_y, x)(1) = src.at<Vec3b>(src_y, x)(1) / 255.0f;
+					dst_inter.at<Vec3f>(dst_y, x)(2) = src.at<Vec3b>(src_y, x)(2) / 255.0f;
+				}
 				break;
 			case 'b': //Bi-Linear
 				src_y1 = floor(y);
@@ -117,21 +121,21 @@ int main(int argc, char** argv) {
 				if (in_Range(src_y1, 0, src.rows)) {
 					if (in_Range(src_y2, 0, src.rows)) {         //Both in range
 						for (int i = 0; i < 3; i++) {
-							dst_inter.at<Vec3b>(dst_y, x)(i) = (uchar)(src.at<Vec3b>(
+							dst_inter.at<Vec3f>(dst_y, x)(i) = ((src.at<Vec3b>(
 								(int)src_y1, x)(i)* (src_y2 - y)
 								+ src.at<Vec3b>((int)src_y2, x)(i)
-								* (y - src_y1));
+								* (y - src_y1))) / 255.0f;
 						}
 					}
 					else {
 						// 1 in range
-						dst_inter.at<Vec3b>(dst_y, x) = src.at<Vec3b>(
-							(int)src_y1, x);
+						dst_inter.at<Vec3f>(dst_y, x) = src.at<Vec3b>(
+							(int)src_y1, x) / 255.0f;
 					}
 				}
 				else if (in_Range(src_y2, 0, src.rows)) {
 					// 2 in range
-					dst_inter.at<Vec3b>(dst_y, x) = src.at<Vec3b>((int)src_y2, x);
+					dst_inter.at<Vec3f>(dst_y, x) = src.at<Vec3b>((int)src_y2, x) / 255.0f;
 				}                              //else None in range
 				break;
 			case 'c': {
@@ -156,7 +160,7 @@ int main(int argc, char** argv) {
 								for (int col = 0; col < MAT_SIZE; col++)
 									croppedDouble[row][col] = cropped.at<Vec3b>(row, col)(i);
 
-							dst_inter.at<Vec3b>(dst_y, x)(i) = (uchar)round(bicubicInterpolate(croppedDouble, 0, 1.0 - distFromSrcY));
+							dst_inter.at<Vec3f>(dst_y, x)(i) = (bicubicInterpolate(croppedDouble, 1.0, 1.0-distFromSrcY)) / 255.0f;
 						}
 					}
 					else {  //Use topRight
@@ -174,8 +178,8 @@ int main(int argc, char** argv) {
 							for (int row = 0; row < MAT_SIZE; row++)
 								for (int col = 0; col < MAT_SIZE; col++)
 									croppedDouble[row][col] = cropped.at<Vec3b>(row, col)(i);
-							double tmp = bicubicInterpolate(croppedDouble, 0, distFromSrcY);
-							dst_inter.at<Vec3b>(dst_y, x)(i) = (uchar)round(tmp);
+							double tmp = bicubicInterpolate(croppedDouble, 1, distFromSrcY);
+							dst_inter.at<Vec3f>(dst_y, x)(i) = (tmp) / 255.0f;
 						}
 					}
 
@@ -185,7 +189,7 @@ int main(int argc, char** argv) {
 			default:
 				src_y = ((int)round(y));
 				if (in_Range(src_y, 0, src.rows))
-					dst_inter.at<Vec3b>(dst_y, x) = src.at<Vec3b>(src_y, x);
+					dst_inter.at<Vec3f>(dst_y, x) = src.at<Vec3b>(src_y, x) / 255.0f;
 				break;
 
 			}
